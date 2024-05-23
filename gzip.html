@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Gzip Coder - Hoaran's Tools</title>
+
+    <!-- Halfmoon CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/halfmoon@2.0.1/css/halfmoon.min.css" rel="stylesheet" integrity="sha256-SsJizWSIG9JT9Qxbiy8xnYJfjCAkhEQ0hihxRn7jt2M=" crossorigin="anonymous">
+    <style>
+        body {
+            margin: 16px;
+        }
+        .btn-group {
+            margin-top: 12px;
+        }
+    </style>
+</head>
+<body>
+
+
+<section class="container px-4">
+    <h1>Gzip Coder</h1>
+
+    <input type="file" class="form-control" id="input-file" />
+
+    <div class="btn-group" role="group" aria-label="Basic example">
+        <button class="btn btn-secondary" id="btn-zip">Gzip</button>
+        <button class="btn btn-secondary" id="btn-unzip" >Unzip</button>
+    </div>
+
+</section>
+
+<!--<script src="https://cdn.jsdelivr.net/npm/pako@2.1.0/lib/inflate.js" type="module"></script>-->
+<script type="module">
+    import pako from 'https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.esm.mjs';
+
+    const input = document.getElementById('input-file');
+    const btnZip = document.getElementById('btn-zip');
+    const btnUnzip = document.getElementById('btn-unzip');
+
+    btnZip.addEventListener('click', () => {
+        const file = input.files[0];
+        const reader = new FileReader();
+        reader.onload = () => {
+            const data = reader.result;
+            const compressed = pako.gzip(data);
+            console.log(compressed);
+            downloadFile(compressed, file.name + '.gz')
+        };
+        reader.readAsArrayBuffer(file);
+    });
+
+    btnUnzip.addEventListener('click', () => {
+        const file = input.files[0];
+        const reader = new FileReader();
+        reader.onload = () => {
+            const data = reader.result;
+            const decompressed = pako.ungzip(data);
+            console.log(decompressed);
+            downloadFile(decompressed, file.name.replace('.gz', ''))
+        };
+        reader.readAsArrayBuffer(file);
+    })
+
+    function downloadFile(data, filename) {
+        const blob = new Blob([data]);
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    console.log(pako)
+</script>
+</body>
+</html>
